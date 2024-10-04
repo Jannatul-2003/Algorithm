@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Stack;
-class GraphNode {
+ class GraphNode {
   public String name;
   public int index;
   public boolean isVisited = false;
