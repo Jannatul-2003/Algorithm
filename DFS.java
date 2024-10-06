@@ -16,10 +16,13 @@ class Vertex {
     Vertex(int name) {
         this.name = name;
     }
+
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Vertex)) return false;
+        if (this == obj)
+            return true;
+        if (!(obj instanceof Vertex))
+            return false;
         Vertex vertex = (Vertex) obj;
         return this.name == vertex.name;
     }
@@ -27,6 +30,9 @@ class Vertex {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+    public String toString(){
+    return Integer.toString(name);
     }
 }
 
@@ -75,43 +81,82 @@ class Graph {
         return graph.get(name);
     }
 
-    public void addEdge(int v1Name, int v2Name) {
+    public void addUndirectedEdge(int v1Name, int v2Name) {
         Vertex v1 = getVertex(v1Name);
         Vertex v2 = getVertex(v2Name);
         v1.neighbours.add(v2);
         v2.neighbours.add(v1);
     }
+    public void addEdge(int from, int to) {
+        Vertex v1 = getVertex(from);
+        Vertex v2 = getVertex(to);
+        v1.neighbours.add(v2);
+    }
 }
 
 public class DFS {
     int time = 0;
+    int numOfTreeEdge = 0;
+
+    class Edge {
+        Vertex v1;
+        Vertex v2;
+
+        Edge(Vertex from, Vertex to) {
+            this.v1 = from;
+            this.v2 = to;
+        }
+        public String toString()
+        {
+            return "("+v1.name+","+v2.name+")";
+        }
+    }
+
+    ArrayList<Edge> BackEdge = new ArrayList<>();
+    ArrayList<Edge> ForwardEdge = new ArrayList<>();
+    ArrayList<Edge> CrosseEdge = new ArrayList<>();
+    ArrayList<Vertex> SelfLoop = new ArrayList<>();
+
+    DFS(Graph g) {
+        for (Vertex v : g.graph.values()) {
+            if (v.color == Vertex.Color.WHITE) {
+                dfsVisit(v);
+                System.out.println();
+            }
+        }
+        System.out.println("TreeEdge: "+numOfTreeEdge+"\nBackEdge: "+BackEdge+"\nForwardEdge: "+ForwardEdge+"\nCrosseEdge: "+CrosseEdge+"\nSelfLoop: "+SelfLoop);
+    }
 
     public void dfsVisit(Vertex u) {
         time++;
         u.color = Vertex.Color.GREY;
         u.discoveredTime = time;
-        System.out.println("Discovered: " + u.name + " at time " + u.discoveredTime);
+        System.out.print(" " + u.name );
 
         for (Vertex v : u.neighbours) {
             if (v.color == Vertex.Color.WHITE) {
                 v.parent = u;
+                numOfTreeEdge++;
                 dfsVisit(v);
+            } else if (v.color == Vertex.Color.GREY) {
+                BackEdge.add(new Edge(u,v));
+                if (u == v)
+                    SelfLoop.add(u);
+            } else {
+                if (v.discoveredTime < u.discoveredTime)
+                    CrosseEdge.add(new Edge(u, v));
+                else
+                    ForwardEdge.add(new Edge(u,v));
             }
         }
         time++;
         u.color = Vertex.Color.BLACK;
         u.finishedTime = time;
-        System.out.println("Finished: " + u.name + " at time " + u.finishedTime);
+       // System.out.println("Finished: " + u.name + " at time " + u.finishedTime);
     }
 
-    public static void main(String[] args) { 
+    public static void main(String[] args) {
         Graph g = new Graph("input.txt");
-        DFS dfs = new DFS();
-        
-        for (Vertex v : g.graph.values()) {
-            if (v.color == Vertex.Color.WHITE) {
-                dfs.dfsVisit(v);
-            }
-        }
+        DFS dfs = new DFS(g);
     }
 }
