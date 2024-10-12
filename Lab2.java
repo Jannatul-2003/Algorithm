@@ -40,17 +40,6 @@ class Vertex {
 class Graph {
     HashMap<Integer, Vertex> graph = new HashMap<>();
 
-    public void init(){
-        time=0;
-        topologicalSort.clear();
-        dfsTraversal.clear();;
-        for(Vertex v: graph.values())
-        {
-            v.color=Vertex.Color.WHITE;
-            v.discoveredTime=Integer.MAX_VALUE;
-            v.finishedTime=Integer.MAX_VALUE;
-        }
-    }
     Graph(String filePath) {
         try {
             createGraphFromFile(filePath);
@@ -112,7 +101,17 @@ class Graph {
     int time = 0;
     Stack<Integer> topologicalSort = new Stack<>();
     ArrayList<Integer> dfsTraversal = new ArrayList<>();
-
+    
+    public void init() {
+        time = 0;
+        topologicalSort.clear();
+        dfsTraversal.clear();
+        for (Vertex v : graph.values()) {
+            v.color = Vertex.Color.WHITE;
+            v.discoveredTime = Integer.MAX_VALUE;
+            v.finishedTime = Integer.MAX_VALUE;
+        }
+    }
     public void DFS(int v1Name) {
         init();
         Vertex v = getVertex(v1Name);
@@ -133,10 +132,10 @@ class Graph {
             }
         }
         List<Integer> result = new ArrayList<>();
-    while (!topologicalSort.isEmpty()) {
-        result.add(topologicalSort.pop());
-    }
-    return result;
+        while (!topologicalSort.isEmpty()) {
+            result.add(topologicalSort.pop());
+        }
+        return result;
     }
 
     public void dfsVisit(Vertex u) {
@@ -155,7 +154,7 @@ class Graph {
         u.color = Vertex.Color.BLACK;
         u.finishedTime = time;
         topologicalSort.push(u.name);
-        //System.out.print("Finished: " + u.name + " at time " + u.finishedTime);
+        // System.out.print("Finished: " + u.name + " at time " + u.finishedTime);
     }
 
 }
