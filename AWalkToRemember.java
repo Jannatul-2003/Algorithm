@@ -41,28 +41,16 @@ class Graph {
     Map<String, Vertex> graph = new HashMap<>();
 
     Graph() {
-        // Default constructor
     }
 
-    // Constructor to initialize graph from file
-    Graph(String filePath) throws FileNotFoundException {
-        createGraphFromFile(filePath);
-    }
+    void createGraph() {
+        Scanner scanner = new Scanner(System.in);
 
-    // Read the graph from a file
-    void createGraphFromFile(String filePath) throws FileNotFoundException {
-        Scanner scanner = new Scanner(new File(filePath));
-
-        // Read number of vertices and edges
         int numVertices = scanner.nextInt();
         int numEdges = scanner.nextInt();
-        scanner.nextLine(); // Move to the next line
-
-        // Process each edge definition
+        scanner.nextLine();
         for (int i = 0; i < numEdges; i++) {
             String[] parts = scanner.nextLine().split(" ");
-
-            // Create vertices if they don't exist and add edge
             Vertex fromVertex = findOrCreateVertex(parts[0].trim());
             Vertex toVertex = findOrCreateVertex(parts[1].trim());
             fromVertex.adjList.add(toVertex);
@@ -70,58 +58,48 @@ class Graph {
         scanner.close();
     }
 
-    // Find or create a vertex by name
     Vertex findOrCreateVertex(String name) {
         return graph.computeIfAbsent(name, Vertex::new);
     }
 
-    // Get all vertices
     Collection<Vertex> getVertices() {
         return graph.values();
     }
 
-    // Print the graph (for debugging)
-    void printGraph() {
-        for (Vertex v : graph.values()) {
-            System.out.print(v + " -> ");
-            for (Vertex adj : v.adjList) {
-                System.out.print(adj + " ");
-            }
-            System.out.println();
-        }
-    }
 }
 
-public class SCC {
+class SCC {
     Graph mainGraph;
     Graph transposeGraph;
     boolean isTranspose = false;
     Stack<Vertex> stack = new Stack<>();
+    int i = 0;
+    ArrayList<ArrayList<Integer>> stronglyConnected = new ArrayList<>();
 
-    SCC(String filePath) {
-        try {
-            mainGraph = new Graph(filePath);
-        } catch (FileNotFoundException e) {
-            System.err.println("Error: File not found - " + e.getMessage());
-        }
+    SCC(Graph graph) {
+        mainGraph = graph;
+
+    }
+
+    ArrayList<ArrayList<Integer>> getStronlyConnected() {
         transposeGraph = getTransposeGraph();
         DFS(mainGraph);
         isTranspose = true;
         while (!stack.isEmpty()) {
             Vertex u = stack.pop();
             if (u.color == Vertex.Color.WHITE) {
-                System.out.println("\nSCC:");
+                stronglyConnected.add(new ArrayList<>());
                 DFSVisit(u);
-                System.out.println();
+                i++;
             }
         }
+        return stronglyConnected;
     }
 
     public Graph getTransposeGraph() {
         Graph transposeGraph = new Graph();
-        for (Vertex v : mainGraph.graph.values()) {
+        for (Vertex v : mainGraph.getVertices()) {
             for (Vertex adj : v.adjList) {
-                // Add the reverse edge in the transpose graph
                 Vertex fromVertex = transposeGraph.findOrCreateVertex(adj.name);
                 Vertex toVertex = transposeGraph.findOrCreateVertex(v.name);
                 fromVertex.adjList.add(toVertex);
@@ -133,16 +111,15 @@ public class SCC {
     public void DFS(Graph currentGraph) {
         for (Vertex v : currentGraph.graph.values()) {
             if (v.color == Vertex.Color.WHITE) {
-                System.out.println("DFS:");
                 DFSVisit(v);
-                System.out.println();
             }
         }
     }
 
     public void DFSVisit(Vertex u) {
         u.color = Vertex.Color.GREY;
-        System.out.print(" " + u);
+        if (isTranspose)
+            stronglyConnected.get(i).add(Integer.parseInt(u.name));
         for (Vertex v : u.adjList) {
             if (v.color == Vertex.Color.WHITE) {
                 v.parent = u;
@@ -156,16 +133,26 @@ public class SCC {
         }
     }
 
+}
+
+public class AWalkToRemember {
     public static void main(String[] args) {
         try {
-            // Redirect stdout to a file
-            PrintStream out = new PrintStream(new FileOutputStream("output.txt"));
-            System.setOut(out);
+            Graph g = new Graph();
 
-            // Redirect stderr to a file
-            PrintStream err = new PrintStream(new FileOutputStream("error.txt"));
-            System.setErr(err);
-            SCC scc = new SCC("input.txt");
+            g.createGraph();
+            SCC scc = new SCC(g);
+
+            int arr[] = new int[g.graph.size() + 1];
+            ArrayList<ArrayList<Integer>> sList = scc.getStronlyConnected();
+            for (List<Integer> list : sList) {
+                if (list.size() > 1) {
+                    for (int i = 0; i < list.size(); i++)
+                        arr[list.get(i)] = 1;
+                }
+            }
+            for (int i = 1; i < arr.length; i++)
+                System.out.print(arr[i] + " ");
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }

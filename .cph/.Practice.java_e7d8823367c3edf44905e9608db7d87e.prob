@@ -1,0 +1,1 @@
+{"name":"Local: Practice","url":"d:\\code\\Algorithm\\Practice.java","tests":[{"id":1729915319955,"input":"3\n3\n1 2\n2 3\n3 1\n4\n1 2\n2 1\n4 3\n3 2\n5\n1 2\n2 1\n5 3\n3 4\n4 5\n","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\code\\Algorithm\\Practice.java","group":"local","local":true}

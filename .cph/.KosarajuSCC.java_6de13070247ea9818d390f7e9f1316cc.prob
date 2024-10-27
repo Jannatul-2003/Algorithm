@@ -1,0 +1,1 @@
+{"name":"Local: KosarajuSCC","url":"d:\\code\\Algorithm\\KosarajuSCC.java","tests":[{"id":1729516511296,"input":"5 5\n1 2 \n2 3 \n3 4 \n4 5\n4 2","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\code\\Algorithm\\KosarajuSCC.java","group":"local","local":true}

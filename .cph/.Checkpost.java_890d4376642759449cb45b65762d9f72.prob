@@ -1,0 +1,1 @@
+{"name":"Local: Checkpost","url":"d:\\code\\Algorithm\\Checkpost.java","tests":[{"id":1730045291108,"input":"3\n1 2 3\n3\n1 2\n2 3\n3 2\n","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"d:\\code\\Algorithm\\Checkpost.java","group":"local","local":true}
