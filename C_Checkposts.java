@@ -8,7 +8,6 @@ public class C_Checkposts {
     public static Integer[] cost;
     public static boolean[] visited;
     public static ArrayList<ArrayList<ArrayList<Integer>>> strongly_connected;
- 
     public static Stack<Integer> stack = new Stack<Integer>();
  
     public static void DFS(Integer node) {
