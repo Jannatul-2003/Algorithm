@@ -29,7 +29,7 @@ public class Kruskal_MST {
         }
     }
 
-    void init(int n) {
+    void makeSet(int n) {
         verticeNum = n;
         parent = new int[n + 1];
         rank = new int[n + 1];
@@ -68,7 +68,7 @@ public class Kruskal_MST {
 
     Set<Edge> kruskal(int n) {
         Set<Edge> result = new HashSet<>();
-        init(n);
+        makeSet(n);
 
         while (!edges.isEmpty()) {
             Edge edge = edges.poll();
