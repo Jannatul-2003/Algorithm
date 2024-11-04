@@ -1,104 +1,94 @@
-import java.io.*;
 import java.util.*;
+import java.io.*;
 
 class Vertex implements Comparable<Vertex> {
     int name;
-    int cost = Integer.MAX_VALUE;
+    int cost;
     Vertex parent = null;
-    HashMap<Vertex, Integer> neighboursWithWeight = new HashMap<>();
+    HashMap<Vertex, Integer> neighbours = new HashMap<>();
 
     Vertex(int name) {
         this.name = name;
+        this.cost = Integer.MAX_VALUE; // Initialize with infinity
     }
 
-    public int compareTo(Vertex that) {
-        return Integer.compare(this.cost, that.cost);
-    }
-
-    public String toString() {
-        return this.name + " " + this.cost;
+    @Override
+    public int compareTo(Vertex other) {
+        return Integer.compare(this.cost, other.cost);
     }
 }
 
 public class Dijkstra {
     HashMap<Integer, Vertex> graph = new HashMap<>();
-    PriorityQueue<Vertex> queue = new PriorityQueue<>();
 
-    Vertex getVertex(int u) {
-        return graph.computeIfAbsent(u, key -> new Vertex(u));
-    }
-
-    void relaxation(Vertex u, Vertex v, int w) {
-        if (v.cost > u.cost + w) {
-            v.cost = u.cost + w;
-            v.parent = u;
-        }
+    Vertex getVertex(int name) {
+        return graph.computeIfAbsent(name, k -> new Vertex(name));
     }
 
     void addEdge(int u, int v, int weight) {
         Vertex uVertex = getVertex(u);
         Vertex vVertex = getVertex(v);
-        uVertex.neighboursWithWeight.put(vVertex, weight);
+        uVertex.neighbours.put(vVertex, weight);
     }
 
-    HashSet<Vertex> getShortestPath(int s) {
-        HashSet<Vertex> set = new HashSet<>();
-        Vertex src = getVertex(s);
-        src.cost = 0;
-        queue.addAll(graph.values());
+    void dijkstra(int start) {
+        Vertex source = getVertex(start);
+        source.cost = 0;
+
+        PriorityQueue<Vertex> queue = new PriorityQueue<>();
+        queue.add(source);
+
         while (!queue.isEmpty()) {
             Vertex current = queue.poll();
-            set.add(current);
-            // for(Vertex v: queue){
-            // System.out.println(v.name+ " "+v.cost);
-            // }
-            // System.out.println(current.name+" ");
-            for (Map.Entry<Vertex, Integer> entry : current.neighboursWithWeight.entrySet()) {
-                relaxation(current, entry.getKey(), entry.getValue());
+
+            // Relaxation of edges
+            for (Map.Entry<Vertex, Integer> entry : current.neighbours.entrySet()) {
+                Vertex neighbor = entry.getKey();
+                int weight = entry.getValue();
+
+                int newCost = current.cost + weight;
+                if (newCost < neighbor.cost) {
+                    neighbor.cost = newCost;
+                    neighbor.parent = current;
+                    queue.add(neighbor); // Re-insert without removing
+                }
             }
         }
-        return set;
     }
 
-    List<String> getPaths(int source) {
-        List<String> paths = new ArrayList<>();
-        for (Vertex vertex : graph.values()) {
-            StringBuilder path = new StringBuilder();
-            path.append("Path to vertex ").append(vertex.name).append(": ");
-            if (vertex.cost == Integer.MAX_VALUE) {
-                path.append("Unreachable");
+    void printPaths(int start) {
+        for (Vertex v : graph.values()) {
+            if (v.cost == Integer.MAX_VALUE) {
+                System.out.println("Vertex " + v.name + " is unreachable from vertex " + start);
             } else {
-                path.append(vertex.cost).append(" (");
-                // Build the path
-                List<Integer> pathList = new ArrayList<>();
-                for (Vertex v = vertex; v != null; v = v.parent) {
-                    pathList.add(v.name);
+                System.out.print("Cost to reach vertex " + v.name + " from vertex " + start + " is " + v.cost);
+                System.out.print(". Path: ");
+                
+                List<Integer> path = new ArrayList<>();
+                for (Vertex at = v; at != null; at = at.parent) {
+                    path.add(at.name);
                 }
-                Collections.reverse(pathList);
-                path.append(String.join(" -> ", pathList.stream().map(String::valueOf).toArray(String[]::new)));
-                path.append(")");
+                Collections.reverse(path);
+                System.out.println(path);
             }
-            paths.add(path.toString());
         }
-        return paths;
     }
 
     public static void main(String[] args) {
         Dijkstra dijkstra = new Dijkstra();
-
-        // Read edges from a file
+        int sourceVertex; 
+        
         try {
-            Scanner scanner = new Scanner(new File("graph_input.txt"));
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                String[] parts = line.split(" ");
-                if (parts.length == 3) {
-                    int u = Integer.parseInt(parts[0]);
-                    int v = Integer.parseInt(parts[1]);
-                    int cost = Integer.parseInt(parts[2]);
-                    dijkstra.addEdge(u, v, cost);
-                }
+            Scanner scanner = new Scanner(new File("input.txt"));
+            int vertxNum = scanner.nextInt();
+            int edgeNum = scanner.nextInt();
+            for (int i = 0; i < edgeNum; i++) {
+                int u = scanner.nextInt();
+                int v = scanner.nextInt();
+                int weight = scanner.nextInt();
+                dijkstra.addEdge(u, v, weight);
             }
+            sourceVertex = scanner.nextInt();
             scanner.close();
         } catch (FileNotFoundException e) {
             System.err.println("File not found: " + e.getMessage());
@@ -106,13 +96,7 @@ public class Dijkstra {
         }
 
         // Run Dijkstra's algorithm from a source vertex
-        int sourceVertex = 0; // Change this to your desired source vertex
-        System.out.println(dijkstra.getShortestPath(sourceVertex));
-        List<String> paths = dijkstra.getPaths(sourceVertex);
-
-        // Print the paths and costs
-        for (String path : paths) {
-            System.out.println(path);
-        }
+        dijkstra.dijkstra(sourceVertex);
+        dijkstra.printPaths(sourceVertex);
     }
 }
