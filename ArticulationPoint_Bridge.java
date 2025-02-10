@@ -1,5 +1,33 @@
 import java.util.*;
-record Pair<T, U>(T u, U v) {
+class Pair<T, U> {
+    T u;
+    U v;
+
+    Pair(T u, U v) {
+        this.u = u;
+        this.v = v;
+    }
+
+    public T getU() {
+        return u;
+    }
+
+    public U getV() {
+        return v;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pair<?, ?> pair = (Pair<?, ?>) o;
+        return Objects.equals(u, pair.u) && Objects.equals(v, pair.v);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(u, v);
+    }
 }
 public class ArticulationPoint_Bridge {
     List<Set<Integer>> adj;
@@ -85,6 +113,7 @@ public class ArticulationPoint_Bridge {
     
                 // Update low[u] considering the subtree rooted at v
                 low[u] = Math.min(low[u], low[v]);
+                System.out.println("u: " + u + " v: " + v + " low[u]: " + low[u] + " low[v]: " + low[v]);
     
                 // Articulation point condition
                 if (parent[u] == -1 && childCount > 1) {
@@ -100,6 +129,7 @@ public class ArticulationPoint_Bridge {
     
             } else if (v != parent[u]) { // Back edge case
                 low[u] = Math.min(low[u], discoverTime[v]);
+                System.out.println("u: " + u + " v: " + v + " low[u]: " + low[u] + " discoverTime[v]: " + discoverTime[v]);
             }
         }
     
@@ -109,12 +139,15 @@ public class ArticulationPoint_Bridge {
     
     public static void main(String[] args) {
         ArticulationPoint_Bridge g = new ArticulationPoint_Bridge();
-        g.Graph(5);
+        g.Graph(6);
         g.addEdge(1, 2);
         g.addEdge(1, 3);
         g.addEdge(2, 3);
         g.addEdge(4, 5);
         g.addEdge(3, 4);
+        g.addEdge(2, 5);
+        g.addEdge(5, 6);
+        g.addEdge(4, 6);
         g.find_articulationPoints_bridges();
         System.out.println("Articulation Points: " + g.articulationPoints);
         System.out.println("Bridges: " + g.bridges);
